@@ -19,8 +19,9 @@ typedef struct _str_stack{
 PStr_stack stack_1 = NULL;
 
 void stack_init();
-int stack_push(int data);
-int stack_pop(int *data);
+int  stack_push(int data);
+int  stack_pop(int *data);
+int  stack_exit(PStr_stack_data stack);
 int  stack_empty();
 int  stack_full();
 void stack_clear();
@@ -70,9 +71,19 @@ void stack_init()
 	printf("stack_init OK!\n");
 }
 
+int stack_exit(PStr_stack_data stack)
+{
+	if(!stack_1->base)
+	{
+		return 1;
+	}
+	
+	return 0;
+}
+
 int stack_empty()
 {
-	if(stack_1->base == stack_1->top && stack_1->base != NULL)
+	if(stack_1->base == stack_1->top && stack_exit(stack_1->base))
 	{
 		return 1;
 	}
@@ -90,7 +101,7 @@ int stack_full()
 }
 void stack_clear()
 {
-	
+	stack_1->top = stack_1->base;
 }
 
 int stack_push(int data)
@@ -112,13 +123,14 @@ int stack_push(int data)
 			offset = stack_1->top - stack_1->base;
 			temp = stack_1->base;
 			
-			stack_1->base = (PStr_stack_data)realloc(stack_1->base, stack_1->total_size + STACK_ADD);
+			stack_1->base = (PStr_stack_data)realloc(stack_1->base, (stack_1->total_size + STACK_ADD)*sizeof(Str_stack_data));
 			if(!stack_1->base)
 			{
 				stack_1->base = temp;
+				printf("space not enouph! realloc failure! \npush failure, rollback!\n");
 				return 0;
 			}
-			stack_1->top = stack_1->base + offset;
+			stack_1->top = stack_1->base + stack_1->total_size;
 			
 			stack_1->total_size += STACK_ADD;
 			stack_1->top->data = data;
