@@ -42,6 +42,9 @@ int main()
 		stack_pop(&temp);
 		printf("stack pop temp:%d!\n", temp);
 	}
+
+	stack_destory(stack_1);
+	
 	printf("execute success!\n");
 	system("pause");
 	return 0;
@@ -142,4 +145,5 @@ int stack_pop(int *data)
 void stack_destory(PStr_stack stack)
 {
 	free(stack);
+	printf("space destory!\n");
 }
