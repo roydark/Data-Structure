@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define STACK_SIZE 100
-#define STACK_ADD  10
+#define STACK_SIZE 4
+#define STACK_ADD  2
 
 typedef struct _str_stack_data{
 	int data;//char *data;
@@ -24,7 +24,7 @@ int stack_pop(int *data);
 int  stack_empty();
 int  stack_full();
 void stack_clear();
-void stack_destory();
+void stack_destory(PStr_stack stack);
 
 int main()
 {
@@ -92,6 +92,9 @@ void stack_clear()
 
 int stack_push(int data)
 {
+	PStr_stack_data temp = NULL;
+	int offset = 0;
+	
 	if(!stack_full())
 	{
 		stack_1->top->data = data;
@@ -101,6 +104,26 @@ int stack_push(int data)
 		printf("push %d success!\n", data);
 		return 1;
 	}
+	else
+		{
+			offset = stack_1->top - stack_1->base;
+			temp = stack_1->base;
+			
+			stack_1->base = (PStr_stack_data)realloc(stack_1->base, stack_1->total_size + STACK_ADD);
+			if(!stack_1->base)
+			{
+				stack_1->base = temp;
+				return 0;
+			}
+			stack_1->top = stack_1->base + offset;
+			
+			stack_1->total_size += STACK_ADD;
+			stack_1->top->data = data;
+			stack_1->top++;
+			printf("space is not enouph, add success!\n");
+			printf("push %d success!\n", data);
+			return 1;
+		}
 	
 	return 0;
 }
@@ -114,4 +137,9 @@ int stack_pop(int *data)
 		return 1;
 	}
 	return 0;
+}
+
+void stack_destory(PStr_stack stack)
+{
+	free(stack);
 }
