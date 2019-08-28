@@ -6,7 +6,8 @@
 
 typedef struct _str_stack_data{
 	int data;//char *data;
-	struct _str_stack *next;
+	//struct _str_stack_data *pre;
+	//struct _str_stack_data *next;
 }Str_stack_data, *PStr_stack_data;
 
 typedef struct _str_stack{
@@ -18,8 +19,8 @@ typedef struct _str_stack{
 PStr_stack stack_1 = NULL;
 
 void stack_init();
-void stack_push();
-void stack_pop();
+int stack_push(int data);
+int stack_pop(int *data);
 int  stack_empty();
 int  stack_full();
 void stack_clear();
@@ -27,7 +28,20 @@ void stack_destory();
 
 int main()
 {
+	int data[5] = {1, 2, 3, 4, 5, };
+	int i = 0;
+	int temp = 0;
 	stack_init();
+	
+	for(i=0;i<5;i++)
+	{
+		stack_push(data[i]);
+	}
+	for(i=0;i<5;i++)
+	{
+		stack_pop(&temp);
+		printf("stack pop temp:%d!\n", temp);
+	}
 	printf("execute success!\n");
 	system("pause");
 	return 0;
@@ -49,7 +63,7 @@ void stack_init()
 		exit(1);
 	}
 	stack_1->total_size = STACK_SIZE;
-
+	
 	printf("stack_init OK!\n");
 }
 
@@ -74,4 +88,30 @@ int stack_full()
 void stack_clear()
 {
 	
+}
+
+int stack_push(int data)
+{
+	if(!stack_full())
+	{
+		stack_1->top->data = data;
+		//stack_1->top->next->pre = stack_1->top;
+		//stack_1->top->next = stack_1->top;
+		stack_1->top++;
+		printf("push %d success!\n", data);
+		return 1;
+	}
+	
+	return 0;
+}
+
+int stack_pop(int *data)
+{
+	if(!stack_empty())
+	{
+		*data = (stack_1->top-1)->data;
+		stack_1->top--;//是否需要销毁数据
+		return 1;
+	}
+	return 0;
 }
