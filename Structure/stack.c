@@ -20,13 +20,14 @@ PStr_stack stack_1 = NULL;
 
 void stack_init();
 int  stack_push(int data);
-int  stack_pop(int *data);
-int  stack_exit(PStr_stack_data stack);
+int  stack_pop();
+int  stack_exit(PStr_stack stack);
+void stack_top_place(PStr_stack stack);
 int  stack_empty();
 int  stack_full();
 void stack_clear();
 void stack_destory(PStr_stack stack);
-
+#if 0
 int main()
 {
 	int data[5] = {1, 2, 3, 4, 5, };
@@ -50,7 +51,7 @@ int main()
 	system("pause");
 	return 0;
 }
-
+#endif
 void stack_init()
 {
 	stack_1 = (PStr_stack)calloc(sizeof(Str_stack), 1);
@@ -67,13 +68,13 @@ void stack_init()
 		exit(1);
 	}
 	stack_1->total_size = STACK_SIZE;
-	
+	stack_top_place(stack_1);
 	printf("stack_init OK!\n");
 }
 
-int stack_exit(PStr_stack_data stack)
+int stack_exit(PStr_stack stack)
 {
-	if(!stack_1->base)
+	if(stack->base)
 	{
 		return 1;
 	}
@@ -81,9 +82,14 @@ int stack_exit(PStr_stack_data stack)
 	return 0;
 }
 
+void stack_top_place(PStr_stack stack)
+{
+	printf("top place:%d\n", stack->top);
+}
+
 int stack_empty()
 {
-	if(stack_1->base == stack_1->top && stack_exit(stack_1->base))
+	if(stack_1->base == stack_1->top && stack_exit(stack_1))
 	{
 		return 1;
 	}
@@ -115,6 +121,7 @@ int stack_push(int data)
 		//stack_1->top->next->pre = stack_1->top;
 		//stack_1->top->next = stack_1->top;
 		stack_1->top++;
+		stack_top_place(stack_1);
 		printf("push %d success!\n", data);
 		return 1;
 	}
@@ -135,6 +142,7 @@ int stack_push(int data)
 			stack_1->total_size += STACK_ADD;
 			stack_1->top->data = data;
 			stack_1->top++;
+			stack_top_place(stack_1);
 			printf("space is not enouph, add success!\n");
 			printf("push %d success!\n", data);
 			return 1;
@@ -143,12 +151,15 @@ int stack_push(int data)
 	return 0;
 }
 
-int stack_pop(int *data)
+int stack_pop()
 {
+	int data = 0;
 	if(!stack_empty())
 	{
-		*data = (stack_1->top-1)->data;
+		data = (stack_1->top-1)->data;
 		stack_1->top--;//是否需要销毁数据
+		stack_top_place(stack_1);
+		printf("stack pop:%d\n", data);
 		return 1;
 	}
 	return 0;
