@@ -19,9 +19,10 @@ typedef struct _str_stack{
 }Str_stack, *PStr_stack;
 #endif
 
-//PStr_stack stack_1 = NULL;
+#ifdef STACK
 
-#if 0
+PStr_stack stack_1 = NULL;
+
 int main()
 {
 	int data[5] = {1, 2, 3, 4, 5, };
