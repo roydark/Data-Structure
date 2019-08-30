@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "stack.h"
 
+#if 0
 #define STACK_SIZE 4
 #define STACK_ADD  2
 
@@ -15,60 +17,52 @@ typedef struct _str_stack{
 	PStr_stack_data top;
 	int total_size;
 }Str_stack, *PStr_stack;
+#endif
 
-PStr_stack stack_1 = NULL;
+//PStr_stack stack_1 = NULL;
 
-void stack_init();
-int  stack_push(int data);
-int  stack_pop();
-int  stack_exit(PStr_stack stack);
-void stack_top_place(PStr_stack stack);
-int  stack_empty();
-int  stack_full();
-void stack_clear();
-void stack_destory(PStr_stack stack);
 #if 0
 int main()
 {
 	int data[5] = {1, 2, 3, 4, 5, };
 	int i = 0;
 	int temp = 0;
-	stack_init();
+	stack_init(&stack_1);
 	
 	for(i=0;i<5;i++)
 	{
-		stack_push(data[i]);
+		stack_push(stack_1, data[i]);
 	}
 	for(i=0;i<5;i++)
 	{
-		stack_pop(&temp);
+		stack_pop(stack_1, &temp);
 		printf("stack pop temp:%d!\n", temp);
 	}
 
-	stack_destory(stack_1);
+	stack_destroy(stack_1);
 	
 	printf("execute success!\n");
 	system("pause");
 	return 0;
 }
 #endif
-void stack_init()
+void stack_init(PStr_stack *stack)
 {
-	stack_1 = (PStr_stack)calloc(sizeof(Str_stack), 1);
-	if(!stack_1)
+	*stack = (PStr_stack)calloc(sizeof(Str_stack), 1);
+	if(!(*stack))
 	{
 		printf("stack_init failure!\n");
 		exit(1);
 	}
-	stack_1->base = (PStr_stack_data)calloc(sizeof(Str_stack_data), STACK_SIZE);
-	stack_1->top = stack_1->base;
-	if(!stack_1->base)
+	(*stack)->base = (PStr_stack_data)calloc(sizeof(Str_stack_data), STACK_SIZE);
+	(*stack)->top = (*stack)->base;
+	if(!(*stack)->base)
 	{
 		printf("stack_init failure!\n");
 		exit(1);
 	}
-	stack_1->total_size = STACK_SIZE;
-	stack_top_place(stack_1);
+	(*stack)->total_size = STACK_SIZE;
+	stack_top_place((*stack));
 	printf("stack_init OK!\n");
 }
 
@@ -87,62 +81,62 @@ void stack_top_place(PStr_stack stack)
 	printf("top place:%d\n", stack->top);
 }
 
-int stack_empty()
+int stack_empty(PStr_stack stack)
 {
-	if(stack_1->base == stack_1->top && stack_exit(stack_1))
+	if(stack->base == stack->top && stack_exit(stack))
 	{
 		return 1;
 	}
 	return 0;
 }
 
-int stack_full()
+int stack_full(PStr_stack stack)
 {
-	if(stack_1->top - stack_1->base == stack_1->total_size 
-		|| stack_1->base - stack_1->top == stack_1->total_size)
+	if(stack->top - stack->base == stack->total_size 
+		|| stack->base - stack->top == stack->total_size)
 		{
 			return 1;
 		}
 	return 0;
 }
-void stack_clear()
+void stack_clear(PStr_stack stack)
 {
-	stack_1->top = stack_1->base;
+	stack->top = stack->base;
 }
 
-int stack_push(int data)
+int stack_push(PStr_stack stack, int data)
 {
 	PStr_stack_data temp = NULL;
 	int offset = 0;
 	
-	if(!stack_full())
+	if(!stack_full(stack))
 	{
-		stack_1->top->data = data;
+		stack->top->data = data;
 		//stack_1->top->next->pre = stack_1->top;
 		//stack_1->top->next = stack_1->top;
-		stack_1->top++;
-		stack_top_place(stack_1);
+		stack->top++;
+		//stack_top_place(stack);
 		printf("push %d success!\n", data);
 		return 1;
 	}
 	else
 		{
-			offset = stack_1->top - stack_1->base;
-			temp = stack_1->base;
+			offset = stack->top - stack->base;
+			temp = stack->base;
 			
-			stack_1->base = (PStr_stack_data)realloc(stack_1->base, (stack_1->total_size + STACK_ADD)*sizeof(Str_stack_data));
-			if(!stack_1->base)
+			stack->base = (PStr_stack_data)realloc(stack->base, (stack->total_size + STACK_ADD)*sizeof(Str_stack_data));
+			if(!stack->base)
 			{
-				stack_1->base = temp;
+				stack->base = temp;
 				printf("space not enouph! realloc failure! \npush failure, rollback!\n");
 				return 0;
 			}
-			stack_1->top = stack_1->base + stack_1->total_size;
+			stack->top = stack->base + stack->total_size;
 			
-			stack_1->total_size += STACK_ADD;
-			stack_1->top->data = data;
-			stack_1->top++;
-			stack_top_place(stack_1);
+			stack->total_size += STACK_ADD;
+			stack->top->data = data;
+			stack->top++;
+			//stack_top_place(stack);
 			printf("space is not enouph, add success!\n");
 			printf("push %d success!\n", data);
 			return 1;
@@ -151,21 +145,21 @@ int stack_push(int data)
 	return 0;
 }
 
-int stack_pop()
+int stack_pop(PStr_stack stack, int *data)
 {
-	int data = 0;
-	if(!stack_empty())
+	//int data = 0;
+	if(!stack_empty(stack))
 	{
-		data = (stack_1->top-1)->data;
-		stack_1->top--;//是否需要销毁数据
-		stack_top_place(stack_1);
-		printf("stack pop:%d\n", data);
+		*data = (stack->top-1)->data;
+		stack->top--;//是否需要销毁数据
+		//stack_top_place(stack);
+		printf("stack pop:%d\n", *data);
 		return 1;
 	}
 	return 0;
 }
 
-void stack_destory(PStr_stack stack)
+void stack_destroy(PStr_stack stack)
 {
 	free(stack);
 	printf("space destory!\n");
